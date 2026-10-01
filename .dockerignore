@@ -29,3 +29,20 @@ logs/
 docs/
 *.md
 !README.md
+
+# Research and private capture state do not belong in the runtime image.
+paper/
+research/
+results/
+datasets/
+output/
+figs/
+handoff/
+memory/
+state/
+.local/
+scratch/
+database/
+tests/
+.github/
+CITATION.cff

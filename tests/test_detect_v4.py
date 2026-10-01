@@ -491,3 +491,25 @@ def test_scan_v4_no_session():
     assert data["success"] is False
     assert data["error"] == "No active session"
     assert data["scan_version"] == "v4.4"
+
+
+def test_config_env_variables():
+    import os
+    import importlib
+    import config
+
+    with patch.dict(os.environ, {
+        "INSIGHTFACE_MODEL": "buffalo_s",
+        "CAMERA_WIDTH": "640",
+        "CAMERA_HEIGHT": "480",
+        "CAMERA_FPS": "15"
+    }):
+        importlib.reload(config)
+
+        assert config.INSIGHTFACE_MODEL == "buffalo_s"
+        assert config.CAMERA_WIDTH == 640
+        assert config.CAMERA_HEIGHT == 480
+        assert config.CAMERA_FPS == 15
+
+    # Restore default config after test
+    importlib.reload(config)

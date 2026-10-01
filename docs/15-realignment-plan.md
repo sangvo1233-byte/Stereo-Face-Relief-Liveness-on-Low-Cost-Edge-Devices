@@ -1,4 +1,6 @@
-﻿# 15 - Ke hoach sap xep lai IOT-project theo face-reg-finnal-project
+> **Historical record (2026-06-25).** This document preserves an earlier migration and its decisions. Its scaffold paths, cleanup proposals, machine-local paths, and pending task list are historical context. For the current research companion, start with `README.md`, `docs/architecture.md`, `docs/reproduction.md`, and `docs/development.md`.
+
+# 15 - Ke hoach sap xep lai IOT-project theo face-reg-finnal-project
 
 Cap nhat: 2026-06-25. Tai lieu nay ghi lai SU THAT ve du an + ke hoach don dep,
 de tranh quen ve sau. DOC TRUOC KHI THUC THI.

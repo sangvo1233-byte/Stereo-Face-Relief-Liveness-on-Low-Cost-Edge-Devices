@@ -1,0 +1,35 @@
+{
+  "created_at": "2026-07-14T16:08:04",
+  "sample_count": 600,
+  "window_count": 592,
+  "confusion_matrix": {
+    "EMPTY": {
+      "LIVE": 0,
+      "SPOOF": 0,
+      "INCONCLUSIVE": 147
+    },
+    "LIVE_USER": {
+      "LIVE": 137,
+      "SPOOF": 0,
+      "INCONCLUSIVE": 12
+    },
+    "PARTIAL": {
+      "LIVE": 1,
+      "SPOOF": 0,
+      "INCONCLUSIVE": 148
+    },
+    "SCREEN_SPOOF": {
+      "LIVE": 0,
+      "SPOOF": 144,
+      "INCONCLUSIVE": 3
+    }
+  },
+  "pilot_metrics": {
+    "apcer_spoof_to_live": 0.0,
+    "bpcer_live_rejected": 0.08053691275167785,
+    "acer": 0.040268456375838924,
+    "notes": "Pilot metric only. INCONCLUSIVE is treated as reject for BPCER and non-live for spoof attacks."
+  },
+  "privacy": "summary contains numeric metrics only; source clips remain local under datasets/ and are gitignored",
+  "skipped_clips": []
+}

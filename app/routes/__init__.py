@@ -12,6 +12,7 @@ from app.routes.enrollment_v2 import router as enrollment_v2_router
 from app.routes.scan_v3 import router as scan_v3_router
 from app.routes.scan_v4 import router as scan_v4_router
 from app.routes.local_scan import router as local_scan_router
+from app.routes.dual_camera import router as dual_camera_router
 
 router = APIRouter()
 
@@ -24,3 +25,4 @@ router.include_router(enrollment_v2_router)
 router.include_router(scan_v3_router)
 router.include_router(scan_v4_router)
 router.include_router(local_scan_router)
+router.include_router(dual_camera_router)

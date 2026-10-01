@@ -1,5 +1,5 @@
-# Face Attendance System - Docker image cho Raspberry Pi 4 (ARM64 / aarch64).
-# Build tren Pi:   docker build -t face-attendance .
+# Face Attendance System - Docker image target cho Raspberry Pi 4 (ARM64 / aarch64).
+# Build tren Pi target:   docker build -t face-attendance .
 # Hoac build da kien truc tu PC:  docker buildx build --platform linux/arm64 -t face-attendance .
 
 FROM python:3.11-slim-bookworm
@@ -22,8 +22,9 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /app
 
 # Cai dependency truoc (tan dung cache layer khi code doi ma deps khong doi).
-# Dung requirements-pi.txt: phien ban DA GHIM, da verify co wheel aarch64
-# (khong build C++ tren Pi). --prefer-binary tranh roi vao build tu source.
+# Dung requirements-pi.txt: phien ban DA GHIM cho Pi target.
+# Can log build/wheel that tren Pi truoc khi ghi la da verify.
+# --prefer-binary tranh roi vao build tu source.
 COPY requirements-pi.txt ./
 RUN pip install --upgrade pip \
     && pip install --prefer-binary -r requirements-pi.txt

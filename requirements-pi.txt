@@ -1,7 +1,6 @@
-# Dependency da GHIM cho Raspberry Pi 4 (ARM64 / aarch64, Python 3.11).
-# Da verify: tat ca deu co wheel aarch64 (hoac pure-Python sdist cho filterpy),
-# KHONG can build C++ tren Pi. Cay phu thuoc resolve sach (pip download --platform
-# manylinux2014_aarch64 --python-version 3.11).
+# Dependency da GHIM cho Raspberry Pi 4 target (ARM64 / aarch64, Python 3.11).
+# Trang thai: pending verification trong repo nay. Truoc khi ghi "da verify",
+# luu log pip download/build that vao docs/pi-verification.md.
 #
 # Luu y rang buoc quan trong: mediapipe 0.10.18 yeu cau numpy<2, con opencv ban
 # moi yeu cau numpy>=2 -> phai ghim numpy 1.26.4 + opencv 4.10.0.84 cho khop.

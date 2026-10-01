@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "base_commit": "26a002a93caf5b3dcf17296bd3ab601737fd5bb2",
+  "prepared_on": "2026-10-01",
+  "files": [
+    {
+      "path": ".env.example",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "5220e1e6a50170679141c8d0001399690625c9faec00909f8dc890f164b0f503",
+      "sha256_lf": "1235f70e48b4078a603a933a3bd9cc2ea7a77e1a6753136c0ba23a0c856d7dff",
+      "review_change": "Document configurable host-frame freshness gate."
+    },
+    {
+      "path": "config.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "b3bed7bf6594c5b444bea08bb41fcd91c983ed86ab0fa865b302e4d0083e0d6b",
+      "sha256_lf": "cae56401d40bf1b8642ca89ade350b4df0fbdcce66f4aa8023c849daa1978166",
+      "review_change": "Make model preload opt-out effective and configure host-frame freshness."
+    },
+    {
+      "path": "main.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "192b8fc847d00288fd29cd61afd19589d31b4257adb2841f0fe98cf862c55d78",
+      "sha256_lf": "192b8fc847d00288fd29cd61afd19589d31b4257adb2841f0fe98cf862c55d78"
+    },
+    {
+      "path": "core/camera.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "444287926676256d0365d94c76d669240502c656b0ddacc68c2e392f9423acdb",
+      "sha256_lf": "444287926676256d0365d94c76d669240502c656b0ddacc68c2e392f9423acdb"
+    },
+    {
+      "path": "app/routes/__init__.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "f74fd39eb43edea1cf8963305249280b860f915397c8bdac17e8a7fa610a596f",
+      "sha256_lf": "f74fd39eb43edea1cf8963305249280b860f915397c8bdac17e8a7fa610a596f"
+    },
+    {
+      "path": "app/routes/dual_camera.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "6a8db4e91532960191f5a42ba81259a7d58ae6336ebd74647db9c1a66679ebe1",
+      "sha256_lf": "1a79b3a07ba3feb2a18e778d12337e356e61447275e518148286940cfbd254b1",
+      "review_change": "Run bounded stereo checks in a serialized worker without blocking the ASGI loop."
+    },
+    {
+      "path": "core/dual_camera.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "3aa4916a54ee2db4f1132bf4360c76f0040fd57e6b32a4ceafdb14c475d410e4",
+      "sha256_lf": "3aa4916a54ee2db4f1132bf4360c76f0040fd57e6b32a4ceafdb14c475d410e4"
+    },
+    {
+      "path": "core/stereo_alignment.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "ef0272377d45b9e84769ff3b5ab3042afd4280edb00f7b92c1db9314f8450fb3",
+      "sha256_lf": "ef0272377d45b9e84769ff3b5ab3042afd4280edb00f7b92c1db9314f8450fb3"
+    },
+    {
+      "path": "core/stereo_liveness.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "fb98e25788ee8856da105d12c3bbc4d5ca86301052f92b2a216d3e77ed7b82cd",
+      "sha256_lf": "e32d000503fb9acde4ea469746e6df56b59e8352a10a5f1a2f2f364c9b4557b1",
+      "review_change": "Reject stale/repeated pairs and non-finite landmarks; serialize unavailable metrics as null. Preserve saved reports with unique, exclusive filenames."
+    },
+    {
+      "path": "web/dual_camera.html",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "5dac481c380fc9785ba3d45d4ef7e37467e58b6028d0672061a5a77a195043e9",
+      "sha256_lf": "5dac481c380fc9785ba3d45d4ef7e37467e58b6028d0672061a5a77a195043e9"
+    },
+    {
+      "path": "scripts/download_models.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "5d83c66d8c6af43dd11785fd13d010b9d072112d68752b150a96e78b73a8a5da",
+      "sha256_lf": "878c1f15ae9089ea6580c5fd88c653456128c1a59520881ccdc4459cd66948bf"
+    },
+    {
+      "path": "scripts/stereo_dataset_benchmark.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "4239cdb680142c95ad77c456d8165ace15a2ac2624a3ce7fe0a39a2ffff8230d",
+      "sha256_lf": "4239cdb680142c95ad77c456d8165ace15a2ac2624a3ce7fe0a39a2ffff8230d"
+    },
+    {
+      "path": "scripts/stereo_dataset_recorder_tkinter.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "868da3bd76b6e87c02532b3fa43d7e1eb8c01bc2e6280d71dedbda1c7e4a2047",
+      "sha256_lf": "868da3bd76b6e87c02532b3fa43d7e1eb8c01bc2e6280d71dedbda1c7e4a2047"
+    },
+    {
+      "path": "tests/test_stereo_liveness.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "e3f87bb56af6e3a1d551e331c8b60f1d1afe3fb9c691b5c586d3a37558537e27",
+      "sha256_lf": "da148a5c9f32bf1d446e08b096258c46630962e42317aa6c2ef4b7feb5115e8d",
+      "review_change": "Add regression checks for concurrency, frame freshness, strict JSON and request bounds."
+    },
+    {
+      "path": "tests/test_detect_v4.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "92c839ca2a006ba9d6de420733808725233957195fd8e82235bbdd09e55463ea",
+      "sha256_lf": "2cfcc9c78ed0d1a1a1e6e625ff8899bf0845693d9dd487589e2f66eef1a08a71",
+      "preparation_change": "Trailing whitespace and final blank line removed; test logic unchanged"
+    },
+    {
+      "path": "Dockerfile",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "a4c8e3f244cc86770bdc67bfd956aa07633c12065f409255975e8bbfc060f1f5",
+      "sha256_lf": "a4c8e3f244cc86770bdc67bfd956aa07633c12065f409255975e8bbfc060f1f5"
+    },
+    {
+      "path": "docker-compose.yml",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "8661fb05fa8e89c581d6644cbc0a67b98483fec771a3da332322feae855386a5",
+      "sha256_lf": "8661fb05fa8e89c581d6644cbc0a67b98483fec771a3da332322feae855386a5"
+    },
+    {
+      "path": "docker/entrypoint.sh",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "2b9b14b7087b2e085b91b2928d15dd229e3a37feb1e58ec1bce57677a01e598b",
+      "sha256_lf": "2b9b14b7087b2e085b91b2928d15dd229e3a37feb1e58ec1bce57677a01e598b"
+    },
+    {
+      "path": "requirements-pi.txt",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "a66afd7dee220697bdb172a8831cd83ca452af54fe79eb24a11ecfc39221e35c",
+      "sha256_lf": "a66afd7dee220697bdb172a8831cd83ca452af54fe79eb24a11ecfc39221e35c"
+    },
+    {
+      "path": "research/stereo_matching/13_temporal_average.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "dbf261ded5548d5c8e5daf39f728118249f39c76896e3ff48f5f8050528cce75",
+      "sha256_lf": "dbf261ded5548d5c8e5daf39f728118249f39c76896e3ff48f5f8050528cce75"
+    },
+    {
+      "path": "research/stereo_matching/15_measure_jitter.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "27703a81ea478edb7888e1951629c00e9de353058c945ab5c188b68dfc2b42eb",
+      "sha256_lf": "27703a81ea478edb7888e1951629c00e9de353058c945ab5c188b68dfc2b42eb"
+    },
+    {
+      "path": "research/stereo_matching/17_epipolar_liveness.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "72abf09e31b8b66ced4d1b96b1601e79bf4138939310d256b45065b8167177f3",
+      "sha256_lf": "72abf09e31b8b66ced4d1b96b1601e79bf4138939310d256b45065b8167177f3"
+    },
+    {
+      "path": "research/stereo_matching/30_rig_geometry_calculator.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "54657e267723bc56475c5f32d57b69481b2b1e0828063d06431a3ab31b861ffe",
+      "sha256_lf": "54657e267723bc56475c5f32d57b69481b2b1e0828063d06431a3ab31b861ffe"
+    },
+    {
+      "path": "research/stereo_matching/31_deep_stereo_pipeline.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "aabf52ff6fbd86606280c7045cc6b20028f8e7a30f4dad13dfa0fa9141cd1dd4",
+      "sha256_lf": "aabf52ff6fbd86606280c7045cc6b20028f8e7a30f4dad13dfa0fa9141cd1dd4"
+    },
+    {
+      "path": "research/stereo_matching/32_pi_three_options_trial.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "e9a5896f2216b0ac1a7d598230c0b998a3ef85d3c817d77f312796770da027e3",
+      "sha256_lf": "e9a5896f2216b0ac1a7d598230c0b998a3ef85d3c817d77f312796770da027e3"
+    },
+    {
+      "path": "research/stereo_matching/34_synthetic_spoof_benchmark.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "e8d7044b824c7194750a891099b49ab84cd4e060d70e450036cd85ede5c11c82",
+      "sha256_lf": "e8d7044b824c7194750a891099b49ab84cd4e060d70e450036cd85ede5c11c82"
+    },
+    {
+      "path": "research/stereo_matching/face_utils.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "017379164a564bf8cf28515fa978499aff73c040b489c0e40a6c2d33231e4c28",
+      "sha256_lf": "017379164a564bf8cf28515fa978499aff73c040b489c0e40a6c2d33231e4c28"
+    },
+    {
+      "path": "results/pilot/20260714_160804/samples.csv",
+      "source": "archived-numeric-pilot-evidence",
+      "source_sha256": "64264956fc2e5006a004a137ff4da9108b5dd4f9a5184c642062ff4aa6ed8ac7",
+      "sha256": "64264956fc2e5006a004a137ff4da9108b5dd4f9a5184c642062ff4aa6ed8ac7"
+    },
+    {
+      "path": "results/pilot/20260714_160804/summary.json",
+      "source": "archived-numeric-pilot-evidence",
+      "source_sha256": "9f58040fed98bcbb9c123cc5abf053534c1d6c242f281b2addfaa0148ef4500d",
+      "sha256": "9f58040fed98bcbb9c123cc5abf053534c1d6c242f281b2addfaa0148ef4500d"
+    },
+    {
+      "path": "results/pilot/20260718_001027/samples.csv",
+      "source": "archived-numeric-pilot-evidence",
+      "source_sha256": "ccf8393d13b54ba7fed55fe3a61d34988c023b61770dc759646c4b798adc3c88",
+      "sha256": "ccf8393d13b54ba7fed55fe3a61d34988c023b61770dc759646c4b798adc3c88"
+    },
+    {
+      "path": "results/pilot/20260718_001027/summary.json",
+      "source": "archived-numeric-pilot-evidence",
+      "source_sha256": "e0c871469bac06cfd41d0bcc0401e611b79099e3697bf1e169c99fa56f18aba2",
+      "sha256": "e0c871469bac06cfd41d0bcc0401e611b79099e3697bf1e169c99fa56f18aba2"
+    },
+    {
+      "path": "research/stereo_matching/03_liveness_planar.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "6a75579aff7c0eb8c2947e6b45941c6f0a573e2146a618ec978292b7b2a9c565",
+      "sha256_lf": "6a75579aff7c0eb8c2947e6b45941c6f0a573e2146a618ec978292b7b2a9c565"
+    },
+    {
+      "path": "research/stereo_matching/11_rig_sweep.py",
+      "source": "local-working-copy",
+      "paper_run_identity": "not established",
+      "source_sha256": "170747e3d9dc97fe90364321e3be4dfc7287e6fbf88b3fb0e37fa82283608e8b",
+      "sha256_lf": "170747e3d9dc97fe90364321e3be4dfc7287e6fbf88b3fb0e37fa82283608e8b"
+    }
+  ],
+  "excluded": "Private face media, databases, embeddings, model weights, secrets, manuscript PDF/source, handoff and agent memory",
+  "claim": "Working-copy software snapshot; no assertion that this is the exact paper-run code revision",
+  "hash_convention": "source_sha256 is original file bytes; sha256_lf is candidate source with LF line endings; numeric evidence sha256 is exact original bytes"
+}
