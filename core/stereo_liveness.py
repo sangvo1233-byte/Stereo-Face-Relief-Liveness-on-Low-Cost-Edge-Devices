@@ -8,6 +8,7 @@ pairing, weak texture, blur, or missing landmarks cannot become a LIVE claim.
 from __future__ import annotations
 
 import json
+import math
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -48,9 +49,11 @@ DEFAULT_THRESHOLDS = StereoThresholds()
 
 def _jsonable(value: Any) -> Any:
     if isinstance(value, np.generic):
-        return value.item()
+        return _jsonable(value.item())
     if isinstance(value, np.ndarray):
-        return value.tolist()
+        return _jsonable(value.tolist())
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
     if isinstance(value, dict):
         return {k: _jsonable(v) for k, v in value.items()}
     if isinstance(value, list):
@@ -180,6 +183,8 @@ def classify_landmark_pair(
         return {"verdict": VERDICT_INCONCLUSIVE, "reason": "invalid landmark shape"}
     if len(pts_left) < 12:
         return {"verdict": VERDICT_INCONCLUSIVE, "reason": "not enough landmarks"}
+    if not np.isfinite(pts_left).all() or not np.isfinite(pts_right).all():
+        return {"verdict": VERDICT_INCONCLUSIVE, "reason": "non-finite landmarks"}
 
     iod = _interocular_distance(pts_right)
     if iod < thresholds.min_iod_px:
@@ -215,7 +220,7 @@ def classify_landmark_pair(
         sampson_pct = float(sampson.mean() / iod * 100.0)
         sampson_p95_pct = float(np.percentile(sampson, 95) / iod * 100.0)
 
-    metrics = {
+    metrics = _jsonable({
         "iod_px": iod,
         "ransac_px": ransac_px,
         "h_inlier": h_inlier,
@@ -224,7 +229,7 @@ def classify_landmark_pair(
         "f_inlier": f_inlier,
         "f_sampson_pct": sampson_pct,
         "f_sampson_p95_pct": sampson_p95_pct,
-    }
+    })
 
     if h_inlier >= thresholds.planar_inlier_min and h_residual_pct <= thresholds.planar_residual_pct_max:
         return {
@@ -391,6 +396,7 @@ def run_stereo_liveness_check(
     started = time.time()
     warmup = _wait_for_frame_pair(dual, warmup_seconds)
     samples: list[dict[str, Any]] = []
+    last_pair = (float("-inf"), float("-inf"))
 
     for index in range(sample_count):
         left, left_ts = dual.get_camera("left").get_latest_frame_with_timestamp(copy=True)
@@ -399,9 +405,16 @@ def run_stereo_liveness_check(
         if left is None or right is None or left_ts is None or right_ts is None:
             sample.update({"verdict": VERDICT_INCONCLUSIVE, "reason": "missing frame from one or both cameras"})
         else:
+            now = time.time()
+            ages = (now - left_ts, now - right_ts)
             host_skew_ms = abs(left_ts - right_ts) * 1000.0
             sample["host_frame_delta_ms"] = host_skew_ms
-            if host_skew_ms > config.STEREO_LIVENESS_MAX_HOST_SKEW_MS:
+            sample["host_frame_age_seconds"] = {"left": ages[0], "right": ages[1]}
+            if not all(0 <= age <= config.STEREO_LIVENESS_MAX_FRAME_AGE_SECONDS for age in ages):
+                sample.update({"verdict": VERDICT_INCONCLUSIVE, "reason": "stale or invalid frame timestamp"})
+            elif left_ts <= last_pair[0] or right_ts <= last_pair[1]:
+                sample.update({"verdict": VERDICT_INCONCLUSIVE, "reason": "frame pair has not advanced"})
+            elif host_skew_ms > config.STEREO_LIVENESS_MAX_HOST_SKEW_MS:
                 sample.update({
                     "verdict": VERDICT_INCONCLUSIVE,
                     "reason": "host frame timestamp delta too high",
@@ -413,6 +426,7 @@ def run_stereo_liveness_check(
                     "right": list(right.shape[:2]),
                 }
                 sample.update(analyze_frame_pair(left, right))
+            last_pair = (max(last_pair[0], left_ts), max(last_pair[1], right_ts))
         samples.append(_jsonable(sample))
         if index < sample_count - 1:
             time.sleep(sample_interval_seconds)
@@ -441,7 +455,7 @@ def run_stereo_liveness_check(
 def _save_report(report: dict[str, Any]) -> Path:
     out_dir = config.LOGS_DIR / "stereo_liveness"
     out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"stereo_liveness_{time.strftime('%Y%m%d_%H%M%S')}.json"
-    with path.open("w", encoding="utf-8") as f:
+    path = out_dir / f"stereo_liveness_{time.strftime('%Y%m%d_%H%M%S')}_{time.time_ns()}.json"
+    with path.open("x", encoding="utf-8") as f:
         json.dump(_jsonable(report), f, ensure_ascii=False, indent=2)
     return path

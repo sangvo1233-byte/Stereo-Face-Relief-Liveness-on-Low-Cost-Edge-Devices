@@ -164,3 +164,91 @@ def test_stereo_liveness_route_passes_parameters(monkeypatch):
     assert res.status_code == 200
     assert res.json()["summary"]["verdict"] == VERDICT_INCONCLUSIVE
     assert seen == {"sample_count": 4, "save_report": False, "warmup_seconds": 0.5}
+
+
+def test_stereo_check_does_not_block_status_or_overlap_shared_models(monkeypatch):
+    import asyncio
+    import threading
+    import httpx
+    from app.routes import dual_camera
+
+    entered, release = threading.Event(), threading.Event()
+    active = []
+
+    def slow_check(**kwargs):
+        active.append(1)
+        assert len(active) == 1
+        entered.set()
+        release.wait(timeout=1)
+        active.pop()
+        return {"success": True}
+
+    monkeypatch.setattr(dual_camera, "run_stereo_liveness_check", slow_check)
+    app = FastAPI()
+    app.include_router(dual_camera.router)
+
+    async def exercise():
+        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+            first = asyncio.create_task(client.post("/api/stereo-liveness/check"))
+            try:
+                assert await asyncio.to_thread(entered.wait, 2)
+                assert active, "Blocking check finished before the event loop could respond"
+                status = await asyncio.wait_for(client.get("/api/stereo-liveness/status"), 0.5)
+                assert status.status_code == 200
+                second = asyncio.create_task(client.post("/api/stereo-liveness/check"))
+                await asyncio.sleep(0.05)
+                release.set()
+                assert (await first).status_code == 200
+                assert (await second).status_code == 200
+            finally:
+                release.set()
+                await first
+
+    asyncio.run(exercise())
+
+
+def test_stereo_check_rejects_stale_and_repeated_frames(monkeypatch):
+    import time
+    from types import SimpleNamespace
+    import core.stereo_liveness as stereo
+
+    frame = np.zeros((480, 640, 3), dtype=np.uint8)
+    monkeypatch.setattr(stereo, "analyze_frame_pair", lambda *a: {"verdict": VERDICT_LIVE})
+    for timestamp in (time.time() - 10, time.time(), time.time() + 10, float("nan")):
+        camera = SimpleNamespace(get_latest_frame_with_timestamp=lambda copy, ts=timestamp: (frame, ts))
+        dual = SimpleNamespace(start=lambda: None, get_camera=lambda side: camera, get_status=lambda: {})
+        result = stereo.run_stereo_liveness_check(
+            dual=dual, sample_count=3, min_votes=3, sample_interval_seconds=0, save_report=False, warmup_seconds=0,
+        )
+        assert result["summary"]["verdict"] == VERDICT_INCONCLUSIVE
+    camera = SimpleNamespace(get_latest_frame_with_timestamp=lambda copy: (frame, time.time()))
+    result = stereo.run_stereo_liveness_check(
+        dual=dual, sample_count=3, min_votes=3, sample_interval_seconds=0, save_report=False, warmup_seconds=0,
+    )
+    assert result["summary"]["verdict"] == VERDICT_LIVE
+
+
+def test_unavailable_epipolar_fit_has_json_safe_metrics(monkeypatch, tmp_path):
+    import json
+    import core.stereo_liveness as stereo
+
+    monkeypatch.setattr(cv2, "findFundamentalMat", lambda *args: (None, None))
+    points = _face_like_points()
+    result = classify_landmark_pair(points, points)
+    assert result["verdict"] == VERDICT_SPOOF
+    json.dumps(result, allow_nan=False)
+    monkeypatch.setattr(stereo.config, "LOGS_DIR", tmp_path)
+    first, second = stereo._save_report(result), stereo._save_report(result)
+    assert first != second
+    assert json.loads(first.read_text())["metrics"]["f_sampson_pct"] is None
+
+
+def test_stereo_route_rejects_unbounded_request_parameters(monkeypatch):
+    from app.routes import dual_camera
+
+    monkeypatch.setattr(dual_camera, "run_stereo_liveness_check", lambda **kwargs: {"success": True})
+    app = FastAPI()
+    app.include_router(dual_camera.router)
+    with TestClient(app) as client:
+        for query in ("sample_count=-1", "sample_count=1000000", "warmup_seconds=-1", "warmup_seconds=inf"):
+            assert client.post("/api/stereo-liveness/check?" + query).status_code == 422

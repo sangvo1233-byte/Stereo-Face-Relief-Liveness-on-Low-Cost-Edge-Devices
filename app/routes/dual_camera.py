@@ -4,10 +4,11 @@ Dual camera and stereo liveness demo routes.
 from __future__ import annotations
 
 import time
+from threading import Lock
 
 import cv2
 import numpy as np
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 
 from core.dual_camera import get_dual_camera
@@ -18,6 +19,8 @@ router = APIRouter(tags=["dual-camera"])
 
 _VALID_IDS = {"left", "right"}
 _BLANK_FRAMES: dict[str, bytes] = {}
+# ponytail: one rig per process; isolate model state if concurrent rigs are needed.
+_STEREO_CHECK_LOCK = Lock()
 
 
 def _blank_frame(label: str) -> bytes:
@@ -141,16 +144,17 @@ async def stereo_liveness_status():
 
 
 @router.post("/api/stereo-liveness/check")
-async def stereo_liveness_check(
-    sample_count: int | None = None,
+def stereo_liveness_check(
+    sample_count: int | None = Query(None, ge=1, le=30),
     save_report: bool | None = None,
-    warmup_seconds: float | None = None,
+    warmup_seconds: float | None = Query(None, ge=0, le=10),
 ):
-    return run_stereo_liveness_check(
-        sample_count=sample_count,
-        save_report=save_report,
-        warmup_seconds=warmup_seconds,
-    )
+    with _STEREO_CHECK_LOCK:
+        return run_stereo_liveness_check(
+            sample_count=sample_count,
+            save_report=save_report,
+            warmup_seconds=warmup_seconds,
+        )
 
 
 @router.get("/api/live/dual/{camera_id}")

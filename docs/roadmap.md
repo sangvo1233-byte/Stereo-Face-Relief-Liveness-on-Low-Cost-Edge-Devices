@@ -18,10 +18,10 @@ These checks describe preparation, not merge or deployment completion.
 
 | Priority | Item | Acceptance |
 | --- | --- | --- |
-| P0 | Owner approves the proposed repository name and public PR contents | Exact rename/publication scope approved; current remote rechecked |
+| Done | Owner approves the proposed repository name and public PR contents | Renamed the same repository and published PR #1 after approval |
 | P0 | Identify the exact accepted/camera-ready artifact | Owner-supplied artifact identity/hash; add a permitted manuscript link when available |
 | P0 | Choose a license for owner-controlled code | License scope agreed by owners; paper/data/model rights kept separate |
-| P1 | Verify a fresh Python 3.11 application environment | Installation log and non-integration pytest result |
+| Done | Verify a fresh Python 3.11 application environment on Linux AMD64 | Installation with documented transitive constraints, `pip check`, 65 non-integration tests, hardware-free startup/API smoke |
 | P1 | Verify the actual camera demo on the chosen machine | Two streams, missing/poor input handling, verdicts, and no unintended attendance recording |
 | P1 | Preserve calibration and Pi trial evidence in shareable form | Numeric/configuration provenance audited and matched to the paper; no private subject media |
 | P1 | Merge the reviewed companion and record a release revision | Reviewed commit, verified public links/citation, matching evidence hashes |
