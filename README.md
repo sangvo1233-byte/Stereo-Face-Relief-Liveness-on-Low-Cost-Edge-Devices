@@ -19,7 +19,7 @@ Publication metadata was checked against IEEE's Crossref deposit on 2026-10-01. 
 **Check the reported host pilot numbers:** Python 3.10+ is sufficient; no camera, model download, or application dependencies are needed.
 
 ```bash
-git clone https://github.com/sangvo1233-byte/IOT-project.git Stereo-Face-Relief-Liveness-on-Low-Cost-Edge-Devices
+git clone https://github.com/sangvo1233-byte/Stereo-Face-Relief-Liveness-on-Low-Cost-Edge-Devices.git Stereo-Face-Relief-Liveness-on-Low-Cost-Edge-Devices
 cd Stereo-Face-Relief-Liveness-on-Low-Cost-Edge-Devices
 python scripts/reproduce_pilot_metrics.py
 ```

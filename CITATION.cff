@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use this research code or protocol, cite the accompanying ICERA paper."
 type: software
 title: "Stereo Face-Relief Liveness on Low-Cost Edge Devices"
-repository-code: "https://github.com/sangvo1233-byte/IOT-project"
+repository-code: "https://github.com/sangvo1233-byte/Stereo-Face-Relief-Liveness-on-Low-Cost-Edge-Devices"
 authors:
   - given-names: "Tieu Cong"
     family-names: "Son Long"
