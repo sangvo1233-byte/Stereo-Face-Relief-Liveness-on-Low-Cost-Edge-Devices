@@ -85,6 +85,14 @@ async def lifespan(app: FastAPI):
     except Exception as exc:
         logger.debug(f"Camera service stop skipped/failed: {exc}")
 
+    try:
+        from core.dual_camera import get_dual_camera
+
+        get_dual_camera().stop()
+        logger.info("Dual camera service stopped")
+    except Exception as exc:
+        logger.debug(f"Dual camera service stop skipped/failed: {exc}")
+
 
 app = FastAPI(
     title=config.APP_NAME,
@@ -176,6 +184,11 @@ async def root():
 @app.get("/phone")
 async def phone_page():
     return FileResponse(str(config.WEB_DIR / "phone.html"))
+
+
+@app.get("/dual-camera")
+async def dual_camera_page():
+    return FileResponse(str(config.WEB_DIR / "dual_camera.html"))
 
 
 if __name__ == "__main__":

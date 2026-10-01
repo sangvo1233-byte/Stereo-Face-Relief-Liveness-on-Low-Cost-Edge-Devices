@@ -3,13 +3,14 @@
 set -euo pipefail
 
 LANDMARKER="models/face_landmarker.task"
-BUFFALO="models/models/buffalo_l"
+MODEL_NAME="${INSIGHTFACE_MODEL:-buffalo_l}"
+BUFFALO="models/models/${MODEL_NAME}"
 
 if [ ! -f "$LANDMARKER" ] || [ ! -d "$BUFFALO" ]; then
-  echo "[entrypoint] Model chua day du -> tai ve (buffalo_l + face_landmarker.task)..."
+  echo "[entrypoint] Model chua day du -> tai ve (${MODEL_NAME} + face_landmarker.task)..."
   python scripts/download_models.py || echo "[entrypoint] CANH BAO: tai model that bai. Server van chay nhung nhan dien se loi cho den khi co model."
 else
-  echo "[entrypoint] Model da co san, bo qua buoc tai."
+  echo "[entrypoint] Model (${MODEL_NAME}) da co san, bo qua buoc tai."
 fi
 
 echo "[entrypoint] Khoi dong FastAPI tren ${HOST:-0.0.0.0}:${PORT:-8000}"

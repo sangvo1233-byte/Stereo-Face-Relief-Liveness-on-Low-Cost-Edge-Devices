@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this research code or protocol, cite the accompanying ICERA paper."
+type: software
+title: "Stereo Face-Relief Liveness on Low-Cost Edge Devices"
+repository-code: "https://github.com/sangvo1233-byte/IOT-project"
+authors:
+  - given-names: "Tieu Cong"
+    family-names: "Son Long"
+  - given-names: "Vo"
+    family-names: "Minh Sang"
+  - given-names: "Nguyen Minh"
+    family-names: "Truong"
+  - given-names: "Hoang"
+    family-names: "Quoc Anh"
+  - given-names: "Nguyen"
+    family-names: "Van Nam"
+preferred-citation:
+  type: conference-paper
+  title: "Toward Stereo Face-Relief Liveness on Low-Cost Edge Devices: An Algorithm Comparison and Feasibility Study"
+  authors:
+    - given-names: "Tieu Cong"
+      family-names: "Son Long"
+    - given-names: "Vo"
+      family-names: "Minh Sang"
+    - given-names: "Nguyen Minh"
+      family-names: "Truong"
+    - given-names: "Hoang"
+      family-names: "Quoc Anh"
+    - given-names: "Nguyen"
+      family-names: "Van Nam"
+  collection-title: "2026 5th International Conference on Electronics Representation and Algorithm (ICERA)"
+  year: 2026
+  month: 7
+  start: "580"
+  end: "585"
+  doi: "10.1109/ICERA72709.2026.11666643"

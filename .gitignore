@@ -82,3 +82,22 @@ temp/
 # Kiro/agent assistant config (local only, not for public repo)
 AGENTS.md
 .kiro/
+
+# Portable repository guidance is public; machine-specific guidance stays local.
+!AGENTS.md
+
+# Private captures and generated/review state are not public research evidence.
+datasets/
+output/
+figs/
+handoff/
+memory/
+state/
+.local/
+scratch/
+research/stereo_matching/figs/
+*.onnx
+*.task
+*.db
+*.sqlite
+*.sqlite3

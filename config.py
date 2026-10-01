@@ -22,6 +22,29 @@ def _env_int(name: str, default: int) -> int:
         return default
 
 
+def _env_float(name: str, default: float) -> float:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
+
+def _env_camera_source(name: str, default: int | str) -> int | str:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    value = value.strip()
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return value
+
+
 def _env_list(name: str, default: list[str] | None = None) -> list[str]:
     value = os.getenv(name)
     if not value:
@@ -52,13 +75,50 @@ for d in [MODELS_DIR, DATABASE_DIR, LOGS_DIR, FACE_CROPS_DIR, EVIDENCE_DIR]:
 SQLITE_DB_PATH = DATABASE_DIR / "attendance.db"
 
 # ── Camera ──────────────────────────────────────────────────
-CAMERA_SOURCE = 0          # 0 = default webcam; use "rtsp://..." for IP cameras
-CAMERA_WIDTH = 1280
-CAMERA_HEIGHT = 720
-CAMERA_FPS = 30
+CAMERA_SOURCE = _env_camera_source("CAMERA_SOURCE", 0)  # 0 = default webcam; use URL for IP cameras
+CAMERA_WIDTH = _env_int("CAMERA_WIDTH", 1280)
+CAMERA_HEIGHT = _env_int("CAMERA_HEIGHT", 720)
+CAMERA_FPS = _env_int("CAMERA_FPS", 30)
+DUAL_CAMERA_LEFT_SOURCE = _env_camera_source("DUAL_CAMERA_LEFT_SOURCE", CAMERA_SOURCE)
+DUAL_CAMERA_RIGHT_SOURCE = _env_camera_source("DUAL_CAMERA_RIGHT_SOURCE", 1)
+DUAL_CAMERA_WIDTH = _env_int("DUAL_CAMERA_WIDTH", 640)
+DUAL_CAMERA_HEIGHT = _env_int("DUAL_CAMERA_HEIGHT", 480)
+DUAL_CAMERA_FPS = _env_int("DUAL_CAMERA_FPS", 15)
+DUAL_CAMERA_FOURCC = os.getenv("DUAL_CAMERA_FOURCC", "MJPG").strip().upper()
+DUAL_CAMERA_BACKEND = os.getenv("DUAL_CAMERA_BACKEND", "auto").strip().lower()
+
+# Static software alignment measured for the current C270 stereo rig.
+STEREO_ALIGNMENT_ENABLED = _env_bool("STEREO_ALIGNMENT_ENABLED", True)
+STEREO_ALIGN_LEFT_DX = _env_int("STEREO_ALIGN_LEFT_DX", 0)
+STEREO_ALIGN_LEFT_DY = _env_int("STEREO_ALIGN_LEFT_DY", 14)
+STEREO_ALIGN_RIGHT_DX = _env_int("STEREO_ALIGN_RIGHT_DX", 0)
+STEREO_ALIGN_RIGHT_DY = _env_int("STEREO_ALIGN_RIGHT_DY", -14)
+STEREO_ALIGN_CROP_X_START = _env_int("STEREO_ALIGN_CROP_X_START", 0)
+STEREO_ALIGN_CROP_X_END = _env_int("STEREO_ALIGN_CROP_X_END", 640)
+STEREO_ALIGN_CROP_Y_START = _env_int("STEREO_ALIGN_CROP_Y_START", 14)
+STEREO_ALIGN_CROP_Y_END = _env_int("STEREO_ALIGN_CROP_Y_END", 466)
+
+# ── Stereo C270 liveness demo ───────────────────────────────
+STEREO_LIVENESS_SAMPLE_COUNT = _env_int("STEREO_LIVENESS_SAMPLE_COUNT", 5)
+STEREO_LIVENESS_MIN_VOTES = _env_int("STEREO_LIVENESS_MIN_VOTES", 3)
+STEREO_LIVENESS_MIN_LIVE_VOTES = _env_int("STEREO_LIVENESS_MIN_LIVE_VOTES", 3)
+STEREO_LIVENESS_SPOOF_SUPPRESS_SECONDS = _env_float("STEREO_LIVENESS_SPOOF_SUPPRESS_SECONDS", 0.0)
+STEREO_LIVENESS_WARMUP_SECONDS = _env_float("STEREO_LIVENESS_WARMUP_SECONDS", 2.0)
+STEREO_LIVENESS_MAX_HOST_SKEW_MS = _env_float("STEREO_LIVENESS_MAX_HOST_SKEW_MS", 120.0)
+STEREO_LIVENESS_MIN_BLUR = _env_float("STEREO_LIVENESS_MIN_BLUR", 35.0)
+STEREO_LIVENESS_MIN_BRIGHTNESS = _env_float("STEREO_LIVENESS_MIN_BRIGHTNESS", 35.0)
+STEREO_LIVENESS_MAX_BRIGHTNESS = _env_float("STEREO_LIVENESS_MAX_BRIGHTNESS", 225.0)
+STEREO_LIVENESS_MIN_IOD_PX = _env_float("STEREO_LIVENESS_MIN_IOD_PX", 45.0)
+STEREO_LIVENESS_PLANAR_INLIER_MIN = _env_float("STEREO_LIVENESS_PLANAR_INLIER_MIN", 0.78)
+STEREO_LIVENESS_PLANAR_RESIDUAL_PCT_MAX = _env_float("STEREO_LIVENESS_PLANAR_RESIDUAL_PCT_MAX", 1.1)
+STEREO_LIVENESS_LIVE_H_INLIER_MAX = _env_float("STEREO_LIVENESS_LIVE_H_INLIER_MAX", 0.75)
+STEREO_LIVENESS_LIVE_H_RESIDUAL_PCT_MIN = _env_float("STEREO_LIVENESS_LIVE_H_RESIDUAL_PCT_MIN", 1.7)
+STEREO_LIVENESS_F_INLIER_MIN = _env_float("STEREO_LIVENESS_F_INLIER_MIN", 0.60)
+STEREO_LIVENESS_F_SAMPSON_PCT_MAX = _env_float("STEREO_LIVENESS_F_SAMPSON_PCT_MAX", 2.0)
+STEREO_LIVENESS_LOG_JSON = _env_bool("STEREO_LIVENESS_LOG_JSON", True)
 
 # ── Face Detection (InsightFace) ────────────────────────────
-INSIGHTFACE_MODEL = "buffalo_l"
+INSIGHTFACE_MODEL = os.getenv("INSIGHTFACE_MODEL", "buffalo_l").strip()
 DET_SIZE = (480, 480)
 MIN_FACE_SIZE = 30
 DET_CONFIDENCE = 0.5

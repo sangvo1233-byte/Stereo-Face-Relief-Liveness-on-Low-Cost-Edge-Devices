@@ -17,12 +17,27 @@ import config
 
 
 class CameraService:
-    def __init__(self):
+    def __init__(
+        self,
+        source=None,
+        name: str = "camera-service",
+        width: int | None = None,
+        height: int | None = None,
+        fps: int | None = None,
+        fourcc: str | None = None,
+        backend: int | None = None,
+    ):
         self._cap: cv2.VideoCapture | None = None
         self._latest_frame: np.ndarray | None = None
         self._last_frame_at = 0.0
         self._error: str | None = None
-        self._source = config.CAMERA_SOURCE
+        self._source = config.CAMERA_SOURCE if source is None else source
+        self._name = name
+        self._width = config.CAMERA_WIDTH if width is None else width
+        self._height = config.CAMERA_HEIGHT if height is None else height
+        self._fps = config.CAMERA_FPS if fps is None else fps
+        self._fourcc = fourcc
+        self._backend = backend
         self._running = False
         self._thread: threading.Thread | None = None
         self._lock = threading.Lock()
@@ -32,7 +47,7 @@ class CameraService:
             return
         self._running = True
         self._error = None
-        self._thread = threading.Thread(target=self._capture_loop, daemon=True, name="camera-service")
+        self._thread = threading.Thread(target=self._capture_loop, daemon=True, name=self._name)
         self._thread.start()
 
     def stop(self):
@@ -48,6 +63,14 @@ class CameraService:
                 return None
             return self._latest_frame.copy() if copy else self._latest_frame
 
+    def get_latest_frame_with_timestamp(self, copy: bool = True) -> tuple[np.ndarray | None, float | None]:
+        with self._lock:
+            frame = self._latest_frame
+            last_frame_at = self._last_frame_at or None
+            if frame is None:
+                return None, last_frame_at
+            return (frame.copy() if copy else frame), last_frame_at
+
     def get_status(self) -> dict:
         with self._lock:
             has_frame = self._latest_frame is not None
@@ -60,6 +83,11 @@ class CameraService:
             "last_frame_at": last_frame_at,
             "frame_age_seconds": round(frame_age, 2) if frame_age is not None else None,
             "source": self._source,
+            "target_width": self._width,
+            "target_height": self._height,
+            "target_fps": self._fps,
+            "target_fourcc": self._fourcc,
+            "backend": self._backend,
             "error": self._error,
         }
 
@@ -107,7 +135,7 @@ class CameraService:
         self.stop()
 
     def _capture_loop(self):
-        interval = 1.0 / max(config.CAMERA_FPS, 1)
+        interval = 1.0 / max(self._fps, 1)
         while self._running:
             if self._cap is None or not self._cap.isOpened():
                 self._open_camera()
@@ -137,12 +165,17 @@ class CameraService:
     def _open_camera(self):
         try:
             logger.info(f"Opening camera: {self._source}")
-            cap = cv2.VideoCapture(self._source)
+            if self._backend is not None and isinstance(self._source, int):
+                cap = cv2.VideoCapture(self._source, self._backend)
+            else:
+                cap = cv2.VideoCapture(self._source)
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
             if isinstance(self._source, int):
-                cap.set(cv2.CAP_PROP_FRAME_WIDTH, config.CAMERA_WIDTH)
-                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, config.CAMERA_HEIGHT)
-                cap.set(cv2.CAP_PROP_FPS, config.CAMERA_FPS)
-                cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+                if self._fourcc and len(self._fourcc) >= 4:
+                    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*self._fourcc[:4]))
+                cap.set(cv2.CAP_PROP_FRAME_WIDTH, self._width)
+                cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self._height)
+                cap.set(cv2.CAP_PROP_FPS, self._fps)
             if not cap.isOpened():
                 self._error = f"Cannot open camera: {self._source}"
                 logger.warning(self._error)

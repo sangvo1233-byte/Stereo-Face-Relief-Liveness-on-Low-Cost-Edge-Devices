@@ -1,4 +1,4 @@
-﻿# Chuan hoa line-ending. Shell script BAT BUOC LF de chay tren Pi (Linux).
+# Chuan hoa line-ending. Shell script BAT BUOC LF de chay tren Pi (Linux).
 * text=auto
 *.sh text eol=lf
 *.py text eol=lf
@@ -7,3 +7,6 @@
 *.service text eol=lf
 Dockerfile* text eol=lf
 *.ps1 text eol=crlf
+
+# Preserve archived numeric evidence byte-for-byte across platforms.
+results/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

@@ -1,4 +1,4 @@
-# Docker Compose cho Raspberry Pi 4 (ARM64).
+# Docker Compose target cho Raspberry Pi 4 (ARM64).
 # Chay:  docker compose up -d --build
 # Xem log:  docker compose logs -f
 services:
@@ -7,19 +7,45 @@ services:
     image: face-attendance:latest
     container_name: face-attendance
     restart: unless-stopped
+    init: true
+    stop_grace_period: 20s
+    mem_limit: 3g
+    cpus: "3.0"
+    pids_limit: 256
     ports:
       - "8000:8000"
     environment:
       APP_ENV: production
       HOST: 0.0.0.0
       PORT: "8000"
+      AUTO_START_CAMERA: "false"
       # Camera mac dinh index 0; doi neu webcam o /dev/video khac.
       CAMERA_SOURCE: "0"
+      DUAL_CAMERA_LEFT_SOURCE: "0"
+      DUAL_CAMERA_RIGHT_SOURCE: "2"
+      DUAL_CAMERA_WIDTH: "640"
+      DUAL_CAMERA_HEIGHT: "480"
+      DUAL_CAMERA_FPS: "15"
+      DUAL_CAMERA_FOURCC: "MJPG"
+      DUAL_CAMERA_BACKEND: "auto"
+      STEREO_LIVENESS_LOG_JSON: "true"
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMEXPR_NUM_THREADS: "1"
+      ORT_NUM_THREADS: "2"
+      OPENCV_VIDEOIO_DEBUG: "0"
     volumes:
       # Giu model tai ve va DB qua cac lan restart (khong build lai/tai lai).
       - ./models:/app/models
       - ./database:/app/database
       - ./logs:/app/logs
     devices:
-      # Mapping USB webcam tren Pi vao container. Sua neu camera o video1...
+      # Mapping USB webcams tren Pi vao container cho stereo demo.
       - "/dev/video0:/dev/video0"
+      - "/dev/video2:/dev/video2"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

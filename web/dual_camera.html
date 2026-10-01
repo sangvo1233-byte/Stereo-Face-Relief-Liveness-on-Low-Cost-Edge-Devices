@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Stereo Camera Demo</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #111316;
+            --panel: #1b2026;
+            --panel-2: #151a20;
+            --line: #313943;
+            --text: #f4f7fb;
+            --muted: #9ba7b4;
+            --accent: #40b3a2;
+            --danger: #d86c5f;
+            --warn: #e0b65b;
+            --blue: #78a7d8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--line);
+            background: #161a1f;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        button,
+        select,
+        input {
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: var(--text);
+            background: var(--panel);
+            font-weight: 700;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        button:disabled {
+            cursor: wait;
+            opacity: 0.55;
+        }
+
+        button.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #07110f;
+        }
+
+        button.live {
+            background: #243f38;
+            border-color: var(--accent);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 390px;
+            gap: 16px;
+            padding: 16px;
+        }
+
+        .stream {
+            min-width: 0;
+            background: #08090a;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stream img {
+            display: block;
+            width: 100%;
+            height: auto;
+            min-height: 300px;
+            object-fit: contain;
+        }
+
+        aside {
+            border-left: 1px solid var(--line);
+            padding-left: 16px;
+        }
+
+        h2 {
+            margin: 0 0 10px;
+            font-size: 14px;
+            letter-spacing: 0;
+        }
+
+        .stack {
+            display: grid;
+            gap: 10px;
+        }
+
+        .panel {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: var(--panel);
+        }
+
+        .panel strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 6px 12px;
+        }
+
+        .metric {
+            min-width: 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .metric span {
+            display: block;
+            margin-top: 2px;
+            color: var(--text);
+            overflow-wrap: anywhere;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 4px 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .value {
+            color: var(--text);
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        .verdict {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 126px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--line);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .ok {
+            color: var(--accent);
+        }
+
+        .bad {
+            color: var(--danger);
+        }
+
+        .warn {
+            color: var(--warn);
+        }
+
+        .blue {
+            color: var(--blue);
+        }
+
+        .verdict.ok {
+            background: #1b342f;
+            border-color: #2d6d61;
+        }
+
+        .verdict.bad {
+            background: #3b2524;
+            border-color: #87413a;
+        }
+
+        .verdict.warn {
+            background: #3c3420;
+            border-color: #8a6d32;
+        }
+
+        .section-title {
+            margin-top: 14px;
+        }
+
+        .history {
+            margin-top: 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--panel-2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        th,
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            color: var(--muted);
+            background: #171d23;
+            font-weight: 700;
+        }
+
+        td {
+            color: var(--text);
+        }
+
+        tr:last-child td {
+            border-bottom: 0;
+        }
+
+        @media (max-width: 1050px) {
+            header,
+            main {
+                display: block;
+            }
+
+            .actions {
+                margin-top: 10px;
+            }
+
+            aside {
+                margin-top: 14px;
+                border-left: 0;
+                padding-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dual Stereo Camera Demo</h1>
+        <div class="actions">
+            <button class="primary" id="startBtn">Start</button>
+            <button id="singleCheckBtn">Check Once</button>
+            <button id="autoBtn">Auto Check</button>
+            <select id="intervalSelect" aria-label="Auto interval">
+                <option value="750">750ms</option>
+                <option value="1000" selected>1s</option>
+                <option value="1500">1.5s</option>
+                <option value="2500">2.5s</option>
+            </select>
+            <select id="sampleSelect" aria-label="Sample count">
+                <option value="1">1 sample</option>
+                <option value="3" selected>3 samples</option>
+                <option value="5">5 samples</option>
+            </select>
+            <button id="stopBtn">Stop</button>
+            <button id="refreshBtn">Refresh</button>
+        </div>
+    </header>
+
+    <main>
+        <section>
+            <div class="stream">
+                <img id="gridStream" src="/api/live/dual-grid" alt="Left and right camera stream">
+            </div>
+
+            <div class="history">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Verdict</th>
+                            <th>Delta</th>
+                            <th>Landmarks</th>
+                            <th>H residual</th>
+                            <th>F Sampson</th>
+                            <th>Reason</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        <tr><td colspan="7">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <aside>
+            <div class="stack">
+                <section>
+                    <h2>Liveness</h2>
+                    <div class="panel">
+                        <strong><span class="verdict warn" id="livenessVerdict">IDLE</span></strong>
+                        <div class="row"><span>reason</span><span class="value" id="livenessReason">-</span></div>
+                        <div class="row"><span>votes</span><span class="value" id="livenessVotes">-</span></div>
+                        <div class="row"><span>elapsed</span><span class="value" id="livenessElapsed">-</span></div>
+                        <div class="row"><span>updated</span><span class="value" id="lastUpdated">-</span></div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Frame</h2>
+                    <div class="panel metrics">
+                        <div class="metric">host delta<span id="hostDelta">-</span></div>
+                        <div class="metric">aligned shape<span id="alignedShape">-</span></div>
+                        <div class="metric">landmarks<span id="landmarkCount">-</span></div>
+                        <div class="metric">warmup<span id="warmupState">-</span></div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Quality</h2>
+                    <div class="panel metrics">
+                        <div class="metric">L brightness<span id="leftBrightness">-</span></div>
+                        <div class="metric">R brightness<span id="rightBrightness">-</span></div>
+                        <div class="metric">L blur<span id="leftBlur">-</span></div>
+                        <div class="metric">R blur<span id="rightBlur">-</span></div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Geometry</h2>
+                    <div class="panel metrics">
+                        <div class="metric">IOD px<span id="iodPx">-</span></div>
+                        <div class="metric">H inlier<span id="hInlier">-</span></div>
+                        <div class="metric">H residual<span id="hResidual">-</span></div>
+                        <div class="metric">H p95<span id="hP95">-</span></div>
+                        <div class="metric">F inlier<span id="fInlier">-</span></div>
+                        <div class="metric">F Sampson<span id="fSampson">-</span></div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Alignment</h2>
+                    <div class="panel metrics">
+                        <div class="metric">enabled<span id="alignEnabled">-</span></div>
+                        <div class="metric">output<span id="alignOutput">-</span></div>
+                        <div class="metric">left shift<span id="alignLeft">-</span></div>
+                        <div class="metric">right shift<span id="alignRight">-</span></div>
+                    </div>
+                </section>
+
+                <section>
+                    <h2>Camera</h2>
+                    <div class="stack" id="status"></div>
+                </section>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        const statusEl = document.getElementById("status");
+        const historyBody = document.getElementById("historyBody");
+        const gridStream = document.getElementById("gridStream");
+        const singleCheckBtn = document.getElementById("singleCheckBtn");
+        const autoBtn = document.getElementById("autoBtn");
+        const intervalSelect = document.getElementById("intervalSelect");
+        const sampleSelect = document.getElementById("sampleSelect");
+
+        const fields = {
+            livenessVerdict: document.getElementById("livenessVerdict"),
+            livenessReason: document.getElementById("livenessReason"),
+            livenessVotes: document.getElementById("livenessVotes"),
+            livenessElapsed: document.getElementById("livenessElapsed"),
+            lastUpdated: document.getElementById("lastUpdated"),
+            hostDelta: document.getElementById("hostDelta"),
+            alignedShape: document.getElementById("alignedShape"),
+            landmarkCount: document.getElementById("landmarkCount"),
+            warmupState: document.getElementById("warmupState"),
+            leftBrightness: document.getElementById("leftBrightness"),
+            rightBrightness: document.getElementById("rightBrightness"),
+            leftBlur: document.getElementById("leftBlur"),
+            rightBlur: document.getElementById("rightBlur"),
+            iodPx: document.getElementById("iodPx"),
+            hInlier: document.getElementById("hInlier"),
+            hResidual: document.getElementById("hResidual"),
+            hP95: document.getElementById("hP95"),
+            fInlier: document.getElementById("fInlier"),
+            fSampson: document.getElementById("fSampson"),
+            alignEnabled: document.getElementById("alignEnabled"),
+            alignOutput: document.getElementById("alignOutput"),
+            alignLeft: document.getElementById("alignLeft"),
+            alignRight: document.getElementById("alignRight"),
+        };
+
+        let autoTimer = null;
+        let checkInFlight = false;
+        let history = [];
+
+        function fmt(value, digits = 2, suffix = "") {
+            if (value === undefined || value === null || Number.isNaN(Number(value))) {
+                return "-";
+            }
+            return `${Number(value).toFixed(digits)}${suffix}`;
+        }
+
+        async function postJSON(url) {
+            const res = await fetch(url, { method: "POST" });
+            if (!res.ok) {
+                throw new Error(`${res.status} ${res.statusText}`);
+            }
+            return res.json();
+        }
+
+        async function loadStatus() {
+            const res = await fetch("/api/dual-camera/status");
+            const data = await res.json();
+            renderStatus(data);
+        }
+
+        function renderStatus(data) {
+            statusEl.innerHTML = Object.entries(data).map(([id, cam]) => {
+                const openedClass = cam.opened ? "ok" : "bad";
+                const frameClass = cam.has_frame ? "ok" : "bad";
+                return `
+                    <div class="panel">
+                        <strong>${id.toUpperCase()}</strong>
+                        <div class="row"><span>opened</span><span class="value ${openedClass}">${cam.opened}</span></div>
+                        <div class="row"><span>has frame</span><span class="value ${frameClass}">${cam.has_frame}</span></div>
+                        <div class="row"><span>age</span><span class="value">${cam.frame_age_seconds ?? "-"}</span></div>
+                        <div class="row"><span>source</span><span class="value">${cam.source}</span></div>
+                        <div class="row"><span>backend</span><span class="value">${cam.backend ?? "-"}</span></div>
+                        <div class="row"><span>target</span><span class="value">${cam.target_width}x${cam.target_height}@${cam.target_fps}</span></div>
+                        <div class="row"><span>fourcc</span><span class="value">${cam.target_fourcc ?? "-"}</span></div>
+                        <div class="row"><span>error</span><span class="value">${cam.error ?? "-"}</span></div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function setVerdict(verdict) {
+            fields.livenessVerdict.textContent = verdict || "-";
+            fields.livenessVerdict.className =
+                `verdict ${verdict === "LIVE" ? "ok" : verdict === "SPOOF" ? "bad" : "warn"}`;
+        }
+
+        function latestUsefulSample(samples) {
+            return [...(samples || [])].reverse().find((sample) => sample.host_frame_delta_ms !== undefined) ||
+                (samples || [])[0] ||
+                {};
+        }
+
+        function renderCheck(data) {
+            const summary = data.summary || {};
+            const votes = summary.votes || {};
+            const sample = latestUsefulSample(data.samples);
+            const quality = sample.quality || {};
+            const metrics = sample.metrics || {};
+            const alignment = data.alignment || {};
+            const warmup = data.warmup || {};
+
+            setVerdict(summary.verdict || "-");
+            fields.livenessReason.textContent = summary.reason || sample.reason || "-";
+            fields.livenessVotes.textContent = `${votes.live ?? 0}/${votes.spoof ?? 0}/${votes.inconclusive ?? 0}`;
+            fields.livenessElapsed.textContent = `${data.elapsed_seconds ?? "-"}s`;
+            fields.lastUpdated.textContent = new Date().toLocaleTimeString();
+            fields.hostDelta.textContent = fmt(sample.host_frame_delta_ms, 1, " ms");
+            fields.alignedShape.textContent = sample.aligned_shape ?
+                `${sample.aligned_shape.left?.[1]}x${sample.aligned_shape.left?.[0]}` : "-";
+            fields.landmarkCount.textContent = sample.landmark_count ?? "-";
+            fields.warmupState.textContent = warmup.ready === true ? "ready" : warmup.ready === false ? "not ready" : "-";
+            fields.leftBrightness.textContent = fmt(quality.left?.brightness, 1);
+            fields.rightBrightness.textContent = fmt(quality.right?.brightness, 1);
+            fields.leftBlur.textContent = fmt(quality.left?.blur, 1);
+            fields.rightBlur.textContent = fmt(quality.right?.blur, 1);
+            fields.iodPx.textContent = fmt(metrics.iod_px, 1);
+            fields.hInlier.textContent = fmt(metrics.h_inlier, 3);
+            fields.hResidual.textContent = fmt(metrics.h_residual_pct, 2, "%");
+            fields.hP95.textContent = fmt(metrics.h_p95_pct, 2, "%");
+            fields.fInlier.textContent = fmt(metrics.f_inlier, 3);
+            fields.fSampson.textContent = fmt(metrics.f_sampson_pct, 2, "%");
+            fields.alignEnabled.textContent = alignment.enabled ?? "-";
+            fields.alignOutput.textContent = alignment.output_width ? `${alignment.output_width}x${alignment.output_height}` : "-";
+            fields.alignLeft.textContent = `${alignment.left_dx ?? "-"}, ${alignment.left_dy ?? "-"}`;
+            fields.alignRight.textContent = `${alignment.right_dx ?? "-"}, ${alignment.right_dy ?? "-"}`;
+
+            history.unshift({
+                time: new Date().toLocaleTimeString(),
+                verdict: summary.verdict || "-",
+                delta: fmt(sample.host_frame_delta_ms, 1, "ms"),
+                landmarks: sample.landmark_count ?? "-",
+                hResidual: fmt(metrics.h_residual_pct, 2, "%"),
+                fSampson: fmt(metrics.f_sampson_pct, 2, "%"),
+                reason: summary.reason || sample.reason || "-",
+            });
+            history = history.slice(0, 20);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyBody.innerHTML = history.map((item) => {
+                const cls = item.verdict === "LIVE" ? "ok" : item.verdict === "SPOOF" ? "bad" : "warn";
+                return `
+                    <tr>
+                        <td>${item.time}</td>
+                        <td class="${cls}">${item.verdict}</td>
+                        <td>${item.delta}</td>
+                        <td>${item.landmarks}</td>
+                        <td>${item.hResidual}</td>
+                        <td>${item.fSampson}</td>
+                        <td>${item.reason}</td>
+                    </tr>
+                `;
+            }).join("") || `<tr><td colspan="7">-</td></tr>`;
+        }
+
+        async function runCheck({ auto = false } = {}) {
+            if (checkInFlight) {
+                return;
+            }
+            checkInFlight = true;
+            singleCheckBtn.disabled = true;
+            setVerdict("CHECKING");
+            try {
+                const sampleCount = Number(sampleSelect.value || 1);
+                const warmup = auto ? 0.2 : 2;
+                const saveReport = auto ? "false" : "true";
+                const url = `/api/stereo-liveness/check?warmup_seconds=${warmup}&sample_count=${sampleCount}&save_report=${saveReport}`;
+                const data = await postJSON(url);
+                renderCheck(data);
+                await loadStatus();
+            } catch (err) {
+                setVerdict("ERROR");
+                fields.livenessReason.textContent = String(err);
+            } finally {
+                checkInFlight = false;
+                singleCheckBtn.disabled = false;
+            }
+        }
+
+        function stopAuto() {
+            if (autoTimer) {
+                clearInterval(autoTimer);
+                autoTimer = null;
+            }
+            autoBtn.textContent = "Auto Check";
+            autoBtn.classList.remove("live");
+        }
+
+        async function startAuto() {
+            await postJSON("/api/dual-camera/start");
+            gridStream.src = `/api/live/dual-grid?t=${Date.now()}`;
+            await loadStatus();
+            await runCheck({ auto: true });
+            autoTimer = setInterval(() => runCheck({ auto: true }), Number(intervalSelect.value || 1000));
+            autoBtn.textContent = "Stop Auto";
+            autoBtn.classList.add("live");
+        }
+
+        document.getElementById("startBtn").addEventListener("click", async () => {
+            await postJSON("/api/dual-camera/start");
+            gridStream.src = `/api/live/dual-grid?t=${Date.now()}`;
+            await loadStatus();
+        });
+
+        document.getElementById("stopBtn").addEventListener("click", async () => {
+            stopAuto();
+            await postJSON("/api/dual-camera/stop");
+            await loadStatus();
+        });
+
+        singleCheckBtn.addEventListener("click", () => runCheck({ auto: false }));
+        autoBtn.addEventListener("click", async () => {
+            if (autoTimer) {
+                stopAuto();
+                return;
+            }
+            await startAuto();
+        });
+        intervalSelect.addEventListener("change", async () => {
+            if (!autoTimer) {
+                return;
+            }
+            stopAuto();
+            await startAuto();
+        });
+        document.getElementById("refreshBtn").addEventListener("click", loadStatus);
+
+        loadStatus();
+        setInterval(loadStatus, 2000);
+    </script>
+</body>
+</html>
